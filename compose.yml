@@ -1,0 +1,12 @@
+services:
+  agroapi:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - agroapi_datos:/app/datos
+    environment:
+      DB_URL: jdbc:h2:file:/app/datos/agroapi;DB_CLOSE_ON_EXIT=FALSE
+      JWT_SECRET_BASE64: ${JWT_SECRET_BASE64:-TGxvbnRvcFZpdmFzQWdyb1NpZXJyYVNlY3VyZTIwMjZXaXRoMzJCeXRlcw==}
+volumes:
+  agroapi_datos:
