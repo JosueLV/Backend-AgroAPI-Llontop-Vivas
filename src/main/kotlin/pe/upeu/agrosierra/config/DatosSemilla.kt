@@ -23,6 +23,17 @@ class DatosSemilla {
                 Rol(nombre = "ADMINISTRADOR", privilegios = (comunes + "USUARIO_GESTIONAR").toMutableSet())
             ))
         }
+        // Alta idempotente: también se aplica si AgroAPI ya tiene una base H2 creada.
+        if (roles.findByNombre("SUPERVISOR_CALIDAD") == null) {
+            val lectura = mutableSetOf("LOTE_LEER", "LABOR_LEER", "LABOR_EDITAR")
+            roles.save(
+                Rol(
+                    nombre = "SUPERVISOR_CALIDAD",
+                    editaTodasLabores = true,
+                    privilegios = lectura
+                )
+            )
+        }
         if (usuarios.count() == 0L) {
             fun agregar(login: String, nombre: String, rol: String) = Usuario(
                 usuario = login, nombre = nombre, passwordHash = passwordEncoder.encode("Agro2026*"),
@@ -32,6 +43,16 @@ class DatosSemilla {
                 agregar("jefe1", "Jefe de campo 1", "JEFE_CAMPO"),
                 agregar("admin", "Administrador AgroSierra", "ADMINISTRADOR")
             ))
+        }
+        if (usuarios.findByUsuario("supervisor1") == null) {
+            usuarios.save(
+                Usuario(
+                    usuario = "supervisor1",
+                    nombre = "Supervisor de calidad",
+                    passwordHash = passwordEncoder.encode("Agro2026*"),
+                    rol = roles.findByNombre("SUPERVISOR_CALIDAD")!!
+                )
+            )
         }
         if (lotes.count() == 0L) {
             lotes.saveAll(listOf(
