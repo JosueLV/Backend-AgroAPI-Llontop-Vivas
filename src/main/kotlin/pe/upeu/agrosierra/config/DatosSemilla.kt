@@ -75,10 +75,12 @@ class DatosSemilla {
             loteLista.forEachIndexed { indice, lote ->
                 // Dos labores por lote, incluso sobre los lotes inicialmente cerrados.
                 valores += Labor(lote = lote, tipo = TipoLabor.RIEGO, fecha = base.minusDays(2),
-                    autor = tecnico, cantidad = 1.0, observacion = "Riego programado", registradoEn = Instant.now().minusSeconds(7200))
+                    autor = tecnico, cantidad = 1.0, cantidadJornales = 2,
+                    observacion = "Riego programado", registradoEn = Instant.now().minusSeconds(7200))
                 valores += Labor(lote = lote,
                     tipo = if (indice <= 2) TipoLabor.COSECHA else TipoLabor.FUMIGACION,
                     fecha = base.minusDays(1), autor = jefe, cantidad = 1.0,
+                    cantidadJornales = if (indice <= 2) 4 else 3,
                     observacion = if (indice <= 2) "Cosecha registrada" else "Aplicación controlada",
                     registradoEn = Instant.now().minusSeconds(3600))
             }
@@ -86,6 +88,7 @@ class DatosSemilla {
             listOf(2, 2, 3, 3).forEachIndexed { i, indice ->
                 valores += Labor(lote = loteLista[indice], tipo = TipoLabor.RIEGO,
                     fecha = base.minusDays(i.toLong()), autor = tecnico, cantidad = 2.0,
+                    cantidadJornales = 2,
                     observacion = "Riego adicional ${i + 1}", registradoEn = Instant.now().minusSeconds(1800))
             }
             labores.saveAll(valores)
