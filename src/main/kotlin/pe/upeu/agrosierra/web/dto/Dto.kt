@@ -15,14 +15,18 @@ data class LoteRespuesta(val id: Long, val codigo: String, val nombre: String, v
 fun Lote.aRespuesta() = LoteRespuesta(id!!, codigo, nombre, hectareas, cultivo, valle, campaniaCerrada, dosisMaximaPorHectarea)
 
 data class LaborRespuesta(val id: Long, val loteId: Long, val tipo: TipoLabor, val fecha: LocalDate,
-    val responsable: String, val cantidad: Double, val observacion: String, val pendiente: Boolean = false)
-fun Labor.aRespuesta() = LaborRespuesta(id!!, lote.id!!, tipo, fecha, autor.nombre, cantidad, observacion)
+    val responsable: String, val cantidad: Double, val cantidadJornales: Int,
+    val observacion: String, val pendiente: Boolean = false)
+fun Labor.aRespuesta() = LaborRespuesta(id!!, lote.id!!, tipo, fecha, autor.nombre, cantidad, cantidadJornales, observacion)
 
 data class CrearLaborPeticion(@field:NotNull val loteId: Long?, @field:NotNull val tipo: TipoLabor?,
     @field:NotNull val fecha: LocalDate?, @field:NotNull @field:Positive val cantidad: Double?,
+    @field:Min(1) val cantidadJornales: Int = 1,
     @field:Size(max = 500) val observacion: String = "")
 data class EditarLaborPeticion(@field:NotNull val tipo: TipoLabor?, @field:NotNull val fecha: LocalDate?,
-    @field:NotNull @field:Positive val cantidad: Double?, @field:Size(max = 500) val observacion: String = "")
+    @field:NotNull @field:Positive val cantidad: Double?,
+    @field:Min(1) val cantidadJornales: Int = 1,
+    @field:Size(max = 500) val observacion: String = "")
 
 data class PaginaRespuesta<T>(val contenido: List<T>, val pagina: Int, val tamanio: Int,
     val totalElementos: Long, val totalPaginas: Int, val ultima: Boolean)
