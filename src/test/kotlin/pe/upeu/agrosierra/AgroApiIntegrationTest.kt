@@ -136,4 +136,29 @@ class AgroApiIntegrationTest {
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.rol").value("JEFE_CAMPO"))
     }
+
+    @Test fun `supervisor de calidad lee y corrige labores ajenas sin cerrar campaña`() {
+        val jwt = token("supervisor1")
+        mvc.perform(get("/api/v1/usuarios/me").header("Authorization", "Bearer $jwt"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.rol").value("SUPERVISOR_CALIDAD"))
+            .andExpect(jsonPath("$.privilegios").isArray)
+
+        // Labor 8 pertenece al jefe1, pero el supervisor tiene alcance para editar todas.
+        mvc.perform(put("/api/v1/labores/8")
+            .header("Authorization", "Bearer $jwt")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""{"tipo":"RIEGO","fecha":"2026-10-29","cantidad":1.0,"observacion":"Revisión de calidad"}"""))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.observacion").value("Revisión de calidad"))
+
+        mvc.perform(post("/api/v1/lotes/3/cerrar-campania")
+            .header("Authorization", "Bearer $jwt"))
+            .andExpect(status().isForbidden)
+        mvc.perform(post("/api/v1/labores")
+            .header("Authorization", "Bearer $jwt")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(cuerpoLote(3)))
+            .andExpect(status().isForbidden)
+    }
 }
