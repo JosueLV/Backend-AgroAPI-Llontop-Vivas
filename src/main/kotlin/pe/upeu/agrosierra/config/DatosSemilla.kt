@@ -23,6 +23,17 @@ class DatosSemilla {
                 Rol(nombre = "ADMINISTRADOR", privilegios = (comunes + "USUARIO_GESTIONAR").toMutableSet())
             ))
         }
+        // Alta idempotente: también se aplica si AgroAPI ya tiene una base H2 creada.
+        if (roles.findByNombre("SUPERVISOR_CALIDAD") == null) {
+            val lectura = mutableSetOf("LOTE_LEER", "LABOR_LEER", "LABOR_EDITAR")
+            roles.save(
+                Rol(
+                    nombre = "SUPERVISOR_CALIDAD",
+                    editaTodasLabores = true,
+                    privilegios = lectura
+                )
+            )
+        }
         if (usuarios.count() == 0L) {
             fun agregar(login: String, nombre: String, rol: String) = Usuario(
                 usuario = login, nombre = nombre, passwordHash = passwordEncoder.encode("Agro2026*"),
@@ -32,6 +43,16 @@ class DatosSemilla {
                 agregar("jefe1", "Jefe de campo 1", "JEFE_CAMPO"),
                 agregar("admin", "Administrador AgroSierra", "ADMINISTRADOR")
             ))
+        }
+        if (usuarios.findByUsuario("supervisor1") == null) {
+            usuarios.save(
+                Usuario(
+                    usuario = "supervisor1",
+                    nombre = "Supervisor de calidad",
+                    passwordHash = passwordEncoder.encode("Agro2026*"),
+                    rol = roles.findByNombre("SUPERVISOR_CALIDAD")!!
+                )
+            )
         }
         if (lotes.count() == 0L) {
             lotes.saveAll(listOf(
@@ -54,10 +75,12 @@ class DatosSemilla {
             loteLista.forEachIndexed { indice, lote ->
                 // Dos labores por lote, incluso sobre los lotes inicialmente cerrados.
                 valores += Labor(lote = lote, tipo = TipoLabor.RIEGO, fecha = base.minusDays(2),
-                    autor = tecnico, cantidad = 1.0, observacion = "Riego programado", registradoEn = Instant.now().minusSeconds(7200))
+                    autor = tecnico, cantidad = 1.0, cantidadJornales = 2,
+                    observacion = "Riego programado", registradoEn = Instant.now().minusSeconds(7200))
                 valores += Labor(lote = lote,
                     tipo = if (indice <= 2) TipoLabor.COSECHA else TipoLabor.FUMIGACION,
                     fecha = base.minusDays(1), autor = jefe, cantidad = 1.0,
+                    cantidadJornales = if (indice <= 2) 4 else 3,
                     observacion = if (indice <= 2) "Cosecha registrada" else "Aplicación controlada",
                     registradoEn = Instant.now().minusSeconds(3600))
             }
@@ -65,6 +88,7 @@ class DatosSemilla {
             listOf(2, 2, 3, 3).forEachIndexed { i, indice ->
                 valores += Labor(lote = loteLista[indice], tipo = TipoLabor.RIEGO,
                     fecha = base.minusDays(i.toLong()), autor = tecnico, cantidad = 2.0,
+                    cantidadJornales = 2,
                     observacion = "Riego adicional ${i + 1}", registradoEn = Instant.now().minusSeconds(1800))
             }
             labores.saveAll(valores)

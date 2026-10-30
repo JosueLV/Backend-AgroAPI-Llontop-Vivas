@@ -73,7 +73,9 @@ class AgroServicio(private val lotes: LoteRepository, private val labores: Labor
         exigirAbierto(lote) // RN-01
         validarDosis(lote, datos.tipo!!, datos.cantidad!!) // RN-04
         val labor = Labor(lote = lote, tipo = datos.tipo, fecha = datos.fecha!!,
-            autor = usuarioActual(auth), cantidad = datos.cantidad, observacion = datos.observacion.trim())
+            autor = usuarioActual(auth), cantidad = datos.cantidad,
+            cantidadJornales = datos.cantidadJornales,
+            observacion = datos.observacion.trim())
         return labores.save(labor).aRespuesta()
     }
 
@@ -92,6 +94,7 @@ class AgroServicio(private val lotes: LoteRepository, private val labores: Labor
         labor.tipo = datos.tipo
         labor.fecha = datos.fecha!!
         labor.cantidad = datos.cantidad
+        labor.cantidadJornales = datos.cantidadJornales
         labor.observacion = datos.observacion.trim()
         return labores.save(labor).aRespuesta()
     }

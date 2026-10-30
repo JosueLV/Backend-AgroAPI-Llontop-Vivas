@@ -136,4 +136,57 @@ class AgroApiIntegrationTest {
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.rol").value("JEFE_CAMPO"))
     }
+
+    @Test fun `supervisor de calidad lee y corrige labores ajenas sin cerrar campaña`() {
+        val jwt = token("supervisor1")
+        mvc.perform(get("/api/v1/usuarios/me").header("Authorization", "Bearer $jwt"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.rol").value("SUPERVISOR_CALIDAD"))
+            .andExpect(jsonPath("$.privilegios").isArray)
+
+        // Labor 8 pertenece al jefe1, pero el supervisor tiene alcance para editar todas.
+        mvc.perform(put("/api/v1/labores/8")
+            .header("Authorization", "Bearer $jwt")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""{"tipo":"RIEGO","fecha":"2026-10-29","cantidad":1.0,"observacion":"Revisión de calidad"}"""))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.observacion").value("Revisión de calidad"))
+
+        mvc.perform(post("/api/v1/lotes/3/cerrar-campania")
+            .header("Authorization", "Bearer $jwt"))
+            .andExpect(status().isForbidden)
+        mvc.perform(post("/api/v1/labores")
+            .header("Authorization", "Bearer $jwt")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(cuerpoLote(3)))
+            .andExpect(status().isForbidden)
+    }
+
+    @Test fun `cantidad de jornales se conserva al crear y corregir labor`() {
+        val jwt = token("tecnico1")
+        val creada = mvc.perform(post("/api/v1/labores")
+            .header("Authorization", "Bearer $jwt")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""{"loteId":3,"tipo":"RIEGO","fecha":"2026-10-27","cantidad":1.0,"cantidadJornales":3,"observacion":"Equipo de riego"}"""))
+            .andExpect(status().isCreated)
+            .andExpect(jsonPath("$.cantidadJornales").value(3))
+            .andReturn().response.contentAsString
+
+        val id = json.readTree(creada)["id"].asLong()
+        mvc.perform(put("/api/v1/labores/$id")
+            .header("Authorization", "Bearer $jwt")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""{"tipo":"RIEGO","fecha":"2026-10-27","cantidad":1.0,"cantidadJornales":5,"observacion":"Equipo ampliado"}"""))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.cantidadJornales").value(5))
+        assertEquals(5, labores.findById(id).orElseThrow().cantidadJornales)
+
+        mvc.perform(post("/api/v1/labores")
+            .header("Authorization", "Bearer $jwt")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""{"loteId":3,"tipo":"RIEGO","fecha":"2026-10-27","cantidad":1.0,"cantidadJornales":0,"observacion":"Invalido"}"""))
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.validationErrors.cantidadJornales").exists())
+    }
+
 }

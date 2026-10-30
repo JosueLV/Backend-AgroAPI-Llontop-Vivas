@@ -54,6 +54,8 @@ class Labor(
     @ManyToOne(fetch = FetchType.EAGER) @JoinColumn(name = "usuario_id", nullable = false)
     var autor: Usuario = Usuario(),
     @Column(nullable = false) var cantidad: Double = 0.0,
+    // DEFAULT 1 permite agregar esta columna a bases H2 ya pobladas sin perder labores.
+    @Column(nullable = false, columnDefinition = "integer default 1") var cantidadJornales: Int = 1,
     @Column(nullable = false, length = 500) var observacion: String = "",
     @Column(nullable = false) var registradoEn: Instant = Instant.now()
 )

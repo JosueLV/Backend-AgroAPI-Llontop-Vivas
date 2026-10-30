@@ -1,103 +1,588 @@
 {
   "info": {
     "name": "AgroAPI-Llontop-Vivas - Examen Unidad 2",
-    "description": "Peticiones de demostración AgroSierra. Ejecutar Login técnico y Login jefe para guardar tokens antes de los casos protegidos.",
+    "description": "AgroSierra · Unidad 2. Ejecutar los logins y luego las peticiones numeradas. Pruebas 400, 401, 403, 409 y DELETE 204. El emulador Android usa 10.0.2.2, Postman en Windows usa localhost.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    {"key": "baseUrl", "value": "http://localhost:8080/api/v1"},
-    {"key": "tokenTecnico", "value": ""},
-    {"key": "tokenJefe", "value": ""},
-    {"key": "tokenAdmin", "value": ""}
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api/v1"
+    },
+    {
+      "key": "tokenTecnico",
+      "value": ""
+    },
+    {
+      "key": "tokenJefe",
+      "value": ""
+    },
+    {
+      "key": "tokenAdmin",
+      "value": ""
+    },
+    {
+      "key": "tokenSupervisor",
+      "value": ""
+    },
+    {
+      "key": "laborCreadaId",
+      "value": ""
+    }
   ],
   "item": [
     {
       "name": "01 Login técnico (200)",
-      "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}],
-        "url": "{{baseUrl}}/auth/login", "body": {"mode": "raw", "raw": "{\"usuario\":\"tecnico1\",\"contrasena\":\"Agro2026*\"}"}},
-      "event": [{"listen": "test", "script": {"exec": ["if (pm.response.code === 200) pm.collectionVariables.set('tokenTecnico', pm.response.json().token);"]}}]
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"usuario\": \"tecnico1\",\n  \"contrasena\": \"Agro2026*\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "if (pm.response.code === 200) pm.collectionVariables.set('tokenTecnico', pm.response.json().token);"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "02 Login jefe (200)",
-      "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}],
-        "url": "{{baseUrl}}/auth/login", "body": {"mode": "raw", "raw": "{\"usuario\":\"jefe1\",\"contrasena\":\"Agro2026*\"}"}},
-      "event": [{"listen": "test", "script": {"exec": ["if (pm.response.code === 200) pm.collectionVariables.set('tokenJefe', pm.response.json().token);"]}}]
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"usuario\": \"jefe1\",\n  \"contrasena\": \"Agro2026*\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "if (pm.response.code === 200) pm.collectionVariables.set('tokenJefe', pm.response.json().token);"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "03 Login administrador (200)",
-      "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}],
-        "url": "{{baseUrl}}/auth/login", "body": {"mode": "raw", "raw": "{\"usuario\":\"admin\",\"contrasena\":\"Agro2026*\"}"}},
-      "event": [{"listen": "test", "script": {"exec": ["if (pm.response.code === 200) pm.collectionVariables.set('tokenAdmin', pm.response.json().token);"]}}]
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"usuario\": \"admin\",\n  \"contrasena\": \"Agro2026*\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "if (pm.response.code === 200) pm.collectionVariables.set('tokenAdmin', pm.response.json().token);"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "04 Sin token (401)",
-      "request": {"method": "GET", "url": "{{baseUrl}}/lotes"}
+      "name": "04 Inicio supervisor calidad (200)",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/auth/login",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"usuario\": \"supervisor1\",\n  \"contrasena\": \"Agro2026*\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "if (pm.response.code === 200) pm.collectionVariables.set('tokenSupervisor', pm.response.json().token);"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "05 Token alterado (401)",
-      "request": {"method": "GET", "url": "{{baseUrl}}/lotes",
-        "header": [{"key": "Authorization", "value": "Bearer token-falso"}]}
+      "name": "05 Sin token (401)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/lotes"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 401', function () { pm.response.to.have.status(401); });"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "06 Listar lotes filtrados (200)",
-      "request": {"method": "GET", "url": "{{baseUrl}}/lotes?pagina=0&tamanio=5&valle=Mantaro&estado=ABIERTA",
-        "header": [{"key": "Authorization", "value": "Bearer {{tokenTecnico}}"}]}
+      "name": "06 Token alterado (401)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/lotes",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer token-falso"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 401', function () { pm.response.to.have.status(401); });"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "07 Detalle de lote (200)",
-      "request": {"method": "GET", "url": "{{baseUrl}}/lotes/4",
-        "header": [{"key": "Authorization", "value": "Bearer {{tokenTecnico}}"}]}
+      "name": "07 Listar lotes filtrados (200)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/lotes?pagina=0&tamanio=5&valle=Mantaro&estado=ABIERTA",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTecnico}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "08 Labores de lote (200)",
-      "request": {"method": "GET", "url": "{{baseUrl}}/lotes/4/labores?pagina=0&tamanio=20",
-        "header": [{"key": "Authorization", "value": "Bearer {{tokenTecnico}}"}]}
+      "name": "08 Detalle de lote (200)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/lotes/4",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTecnico}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "09 Crear labor (201)",
-      "request": {"method": "POST", "url": "{{baseUrl}}/labores",
-        "header": [{"key": "Authorization", "value": "Bearer {{tokenTecnico}}"}, {"key": "Content-Type", "value": "application/json"}],
-        "body": {"mode": "raw", "raw": "{\"loteId\":4,\"tipo\":\"RIEGO\",\"fecha\":\"2026-10-27\",\"cantidad\":1,\"observacion\":\"Riego desde Postman\"}"}},
-      "event": [{"listen": "test", "script": {"exec": ["if (pm.response.code === 201) pm.collectionVariables.set('laborCreadaId', pm.response.json().id);"]}}]
+      "name": "09 Labores de lote (200)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/lotes/4/labores?pagina=0&tamanio=20",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTecnico}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "10 Editar labor propia (200)",
-      "request": {"method": "PUT", "url": "{{baseUrl}}/labores/{{laborCreadaId}}",
-        "header": [{"key": "Authorization", "value": "Bearer {{tokenTecnico}}"}, {"key": "Content-Type", "value": "application/json"}],
-        "body": {"mode": "raw", "raw": "{\"tipo\":\"RIEGO\",\"fecha\":\"2026-10-27\",\"cantidad\":1.5,\"observacion\":\"Corrección antes de 24 horas\"}"}}
+      "name": "10 Crear labor (201)",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/labores",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTecnico}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"loteId\": 4,\n  \"tipo\": \"RIEGO\",\n  \"fecha\": \"2026-10-27\",\n  \"cantidad\": 1,\n  \"observacion\": \"Riego desde Postman\",\n  \"cantidadJornales\": 2\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+              "if (pm.response.code === 201) pm.collectionVariables.set('laborCreadaId', pm.response.json().id);"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "11 Usuario actual (200)",
-      "request": {"method": "GET", "url": "{{baseUrl}}/usuarios/me",
-        "header": [{"key": "Authorization", "value": "Bearer {{tokenTecnico}}"}]}
+      "name": "11 Editar labor propia (200)",
+      "request": {
+        "method": "PUT",
+        "url": "{{baseUrl}}/labores/{{laborCreadaId}}",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTecnico}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tipo\": \"RIEGO\",\n  \"fecha\": \"2026-10-27\",\n  \"cantidad\": 1.5,\n  \"observacion\": \"Corrección antes de 24 horas\",\n  \"cantidadJornales\": 2\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "12 Administrador sin privilegio LABOR_CREAR (403)",
-      "request": {"method": "POST", "url": "{{baseUrl}}/labores",
-        "header": [{"key": "Authorization", "value": "Bearer {{tokenAdmin}}"}, {"key": "Content-Type", "value": "application/json"}],
-        "body": {"mode": "raw", "raw": "{\"loteId\":4,\"tipo\":\"RIEGO\",\"fecha\":\"2026-10-27\",\"cantidad\":1,\"observacion\":\"No autorizado\"}"}}
+      "name": "12 Usuario actual (200)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/usuarios/me",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTecnico}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "13 Fumigación excesiva RN-04 (400)",
-      "request": {"method": "POST", "url": "{{baseUrl}}/labores",
-        "header": [{"key": "Authorization", "value": "Bearer {{tokenTecnico}}"}, {"key": "Content-Type", "value": "application/json"}],
-        "body": {"mode": "raw", "raw": "{\"loteId\":4,\"tipo\":\"FUMIGACION\",\"fecha\":\"2026-10-27\",\"cantidad\":100,\"observacion\":\"Excede la dosis\"}"}}
+      "name": "13 Administrador sin privilegio LABOR_CREAR (403)",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/labores",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenAdmin}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"loteId\": 4,\n  \"tipo\": \"RIEGO\",\n  \"fecha\": \"2026-10-27\",\n  \"cantidad\": 1,\n  \"observacion\": \"No autorizado\",\n  \"cantidadJornales\": 2\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 403', function () { pm.response.to.have.status(403); });"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "14 Labor sobre campaña cerrada RN-01 (409)",
-      "request": {"method": "POST", "url": "{{baseUrl}}/labores",
-        "header": [{"key": "Authorization", "value": "Bearer {{tokenTecnico}}"}, {"key": "Content-Type", "value": "application/json"}],
-        "body": {"mode": "raw", "raw": "{\"loteId\":1,\"tipo\":\"RIEGO\",\"fecha\":\"2026-10-27\",\"cantidad\":1,\"observacion\":\"Cerrada\"}"}}
+      "name": "14 Fumigación excesiva RN-04 (400)",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/labores",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTecnico}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"loteId\": 4,\n  \"tipo\": \"FUMIGACION\",\n  \"fecha\": \"2026-10-27\",\n  \"cantidad\": 100,\n  \"observacion\": \"Excede la dosis\",\n  \"cantidadJornales\": 2\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });",
+              "pm.test('400 informa campo cantidad', function () { pm.expect(pm.response.json().validationErrors.cantidad).to.exist; });"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "15 Cerrar sin cosecha RN-03 (409)",
-      "request": {"method": "POST", "url": "{{baseUrl}}/lotes/4/cerrar-campania",
-        "header": [{"key": "Authorization", "value": "Bearer {{tokenJefe}}"}]}
+      "name": "15 Labor sobre campaña cerrada RN-01 (409)",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/labores",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenTecnico}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"loteId\": 1,\n  \"tipo\": \"RIEGO\",\n  \"fecha\": \"2026-10-27\",\n  \"cantidad\": 1,\n  \"observacion\": \"Cerrada\",\n  \"cantidadJornales\": 2\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 409', function () { pm.response.to.have.status(409); });"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "16 Borrar labor (204, sin cuerpo)",
-      "request": {"method": "DELETE", "url": "{{baseUrl}}/labores/{{laborCreadaId}}",
-        "header": [{"key": "Authorization", "value": "Bearer {{tokenJefe}}"}]}
+      "name": "16 Cerrar sin cosecha RN-03 (409)",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/lotes/4/cerrar-campania",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenJefe}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 409', function () { pm.response.to.have.status(409); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "17 Supervisor edita labor de otro usuario (200)",
+      "request": {
+        "method": "PUT",
+        "url": "{{baseUrl}}/labores/{{laborCreadaId}}",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenSupervisor}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tipo\": \"RIEGO\",\n  \"fecha\": \"2026-10-27\",\n  \"cantidad\": 1.25,\n  \"cantidadJornales\": 3,\n  \"observacion\": \"Supervisión de calidad: corrección de labor ajena\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "18 Supervisor sin privilegio para cerrar campaña (403)",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/lotes/4/cerrar-campania",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenSupervisor}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 403', function () { pm.response.to.have.status(403); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "19 Supervisor sin privilegio para crear labor (403)",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/labores",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenSupervisor}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"loteId\": 4,\n  \"tipo\": \"RIEGO\",\n  \"fecha\": \"2026-10-27\",\n  \"cantidad\": 1,\n  \"cantidadJornales\": 2,\n  \"observacion\": \"Debe ser 403\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 403', function () { pm.response.to.have.status(403); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20 Borrar labor (204, sin cuerpo)",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/labores/{{laborCreadaId}}",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenJefe}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 204', function () { pm.response.to.have.status(204); });",
+              "pm.test('204 sin cuerpo', function () { pm.expect(pm.response.text()).to.eql(''); });"
+            ]
+          }
+        }
+      ]
     }
   ]
 }
