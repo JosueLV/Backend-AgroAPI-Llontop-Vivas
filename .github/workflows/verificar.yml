@@ -1,0 +1,24 @@
+name: Verificación AgroAPI
+
+on:
+  push:
+    branches: [develop, main, "feature/**", "fix/**", "test/**", "sc-**"]
+  pull_request:
+    branches: [develop, main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+      - name: Preparar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - name: Ejecutar pruebas de integración
+        run: |
+          chmod +x ./mvnw
+          ./mvnw -B -ntp test
